@@ -1,11 +1,13 @@
-
+use v6;
 
 use Bank;
+
 unit module NBP;
 
 class  NBP::NBP does Bank::currency-value {
 
     use JSON::Tiny;
+    use HTTP::Tinyish;
 
     has %.valutes is rw;
     has %.res;
@@ -20,7 +22,7 @@ class  NBP::NBP does Bank::currency-value {
         self.bless(:$currency, :$table, :$date, :$http_timeout);
     }
     method TWEAK() {
-        $.url = $.url ~ "$.table/$.currency?format=json";
+        $.url = $.url ~ "$.table/$.currency/$.date?format=json";
         #%.valutes = Nil;
     }
 

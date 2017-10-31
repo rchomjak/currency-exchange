@@ -1,3 +1,4 @@
+use v6;
 
 use Bank;
 unit module MBANK;
@@ -6,6 +7,7 @@ class  MBANK::MBANK does Bank::currency-value  {
 
     use IO::String;
     use CSV::Parser;
+    use HTTP::Tinyish;
 
     has %.valutes is rw;
     has %.res;
@@ -20,8 +22,8 @@ class  MBANK::MBANK does Bank::currency-value  {
         self.bless(:$currency, :$date, :$http_timeout);
     }
     method TWEAK() {
-        $.url = $.url ~ "\$date=$.date&lang=en";
-        #%.valutes = Nil;
+        $.url = $.url ~ "&date=$.date&lang=en";
+
     }
 
     method set_url (Str $new_url) {
@@ -32,7 +34,7 @@ class  MBANK::MBANK does Bank::currency-value  {
 
         my $http = HTTP::Tinyish.new(agent => 'Mozilla/5.0', timeout=>$.http_timeout);
         %.res = $http.get($.url);
-
+        say $.url;
         if %.res<status>.Int == 200 {
             $.dwn_state = True;
         }

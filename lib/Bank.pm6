@@ -1,3 +1,5 @@
+use v6;
+
 unit module Bank;
 
 role Bank::currency-value is export {

@@ -1,3 +1,4 @@
+use v6;
 
 use Bank;
 unit module PEKAO;
@@ -7,6 +8,7 @@ class  PEKAO::PEKAO does Bank::currency-value {
     #Currency exchange works only for Date.today, I do not know how to find proper table for another day :-X
     use XML;
     use IO::String;
+    use HTTP::Tinyish;
 
     has %.valutes is rw;
     has %.res;
@@ -76,14 +78,17 @@ class  PEKAO::PEKAO does Bank::currency-value {
         }
 
         if $searched_element.defined {
-
+          my $przelicznik = $searched_element.getElementsByTagName("przelicznik")[0].contents[0].Str;
           %.valutes{"code"} = $searched_element.getElementsByTagName("iso")[0].contents[0].Str;
           %.valutes{"full_name"} = $searched_element.getElementsByTagName("kraj")[0].contents[0].Str;
           %.valutes{"date"} = $record_date if $record_date.defined;
-          %.valutes{"ask"} = $searched_element.getElementsByTagName("sprzedaz")[0].contents[0];
-          %.valutes{"bid"} =  $searched_element.getElementsByTagName("kupno")[0].contents[0];
 
-          say %.valutes;
+          my Cool $ask =$searched_element.getElementsByTagName("sprzedaz")[0].contents[0].Str;
+          my Cool $bid = $searched_element.getElementsByTagName("kupno")[0].contents[0].Str;
+          $ask = $ask.Rat / $przelicznik.Rat;
+          %.valutes{"ask"} = $ask;
+          %.valutes{"bid"} = $bid.Rat / $przelicznik.Rat;
+
         }
 
 
