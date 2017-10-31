@@ -3,12 +3,13 @@ use v6;
 use Bank;
 unit module PEKAO;
 
-
 class  PEKAO::PEKAO does Bank::currency-value {
     #Currency exchange works only for Date.today, I do not know how to find proper table for another day :-X
+
     use XML;
     use IO::String;
     use HTTP::Tinyish;
+
 
     has %.valutes is rw;
     has %.res;

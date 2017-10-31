@@ -13,7 +13,7 @@ class  MBANK::MBANK does Bank::currency-value  {
     has %.res;
     has Str $.currency;
     has Str $.table;
-    has Str $.url is rw = qqww{https://www.mbank.pl/ajax/currency/getCSV/?id=1};
+    has Str $.url is rw = qqww{https://www.mbank.pl/ajax/currency/getCSV/};
     has Str $.date;
     has Bool $.dwn_state is rw = False;
     has Int $.http_timeout;
@@ -22,7 +22,12 @@ class  MBANK::MBANK does Bank::currency-value  {
         self.bless(:$currency, :$date, :$http_timeout);
     }
     method TWEAK() {
-        $.url = $.url ~ "&date=$.date&lang=en";
+        if $.date eq Date.today.gist.Str {
+            $.url =  $.url ~ "?id=0" ~ "&date=$.date&lang=en";
+        }
+        else {
+            $.url =  $.url ~ "?id=1" ~ "&date=$.date&lang=en";
+        }
 
     }
 
@@ -34,7 +39,6 @@ class  MBANK::MBANK does Bank::currency-value  {
 
         my $http = HTTP::Tinyish.new(agent => 'Mozilla/5.0', timeout=>$.http_timeout);
         %.res = $http.get($.url);
-        say $.url;
         if %.res<status>.Int == 200 {
             $.dwn_state = True;
         }

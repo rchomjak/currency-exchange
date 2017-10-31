@@ -9,7 +9,7 @@ class  NBP::NBP does Bank::currency-value {
     use JSON::Tiny;
     use HTTP::Tinyish;
 
-    has %.valutes is rw;
+    has %.valutes;
     has %.res;
     has Str $.currency;
     has Str $.table;
