@@ -1,25 +1,7 @@
 #!/usr/bin/env perl6
 use v6;
 
-#use HTTP::Tinyish;
-
-use lib 'lib';
-
-require Bank;
-require NBPref;
-require NBP;
-require MBANK;
-require PEKAO;
-
-use Bank;
-use NBPref;
-use NBP;
-use MBANK;
-use PEKAO;
-
-
-try {
-
+BEGIN {try {
 require XML;
 require IO::String;
 require HTTP::Tinyish;
@@ -27,10 +9,40 @@ require CSV::Parser;
 require JSON::Tiny;
     CATCH {
 
-        when X::CompUnit::UnsatisfiedDependency { say "Problem with modules."; say "Dependencies: XML, IO::String, HTTP::Tinyish, CSV::Parser, JSON::Tiny";}
+        when X::CompUnit::UnsatisfiedDependency {
+         say "WARNING !!!: Problem with modules.";
+         say "Dependencies: XML, IO::String, HTTP::Tinyish, CSV::Parser, JSON::Tiny";
+         say "";
+         print Q:c:to/EOH/;
+         Downloads and sorts currency rates for specified operation based on currency.
+         Program shows mid. currency rate (Zloty) based on National Bank of Poland as reference.
+
+         Every bank output record is in ZL => Zloty currency.
+
+         List of banks which sell/buys currency:
+         NBP (National Bank of Poland) - NBP also sells/buys currency , PEKAO, MBANK
+
+         EOH
+
+}
         default {.resume}
     }
-}
+}}
+
+use lib 'lib';
+
+use XML;
+use IO::String;
+use HTTP::Tinyish;
+use CSV::Parser;
+use JSON::Tiny;
+
+use Bank;
+use NBPref;
+use NBP;
+use MBANK;
+use PEKAO;
+
 
 
 

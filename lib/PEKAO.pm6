@@ -10,7 +10,6 @@ class  PEKAO::PEKAO does Bank::currency-value {
     use IO::String;
     use HTTP::Tinyish;
 
-
     has %.valutes is rw;
     has %.res;
     has Str $.currency;
@@ -19,7 +18,6 @@ class  PEKAO::PEKAO does Bank::currency-value {
     has Str $.url is rw = qqww{https://www.pekao.com.pl/exchange_static?type=pekao&format=XML};
     has Str $.date;
     has Bool $.dwn_state is rw = False;
-
 
     method new(Str $currency_?, Int $http_timeout_=10, Str $date_=Date.today.gist.Str, Int :$http_timeout=$http_timeout_, Str :$currency = $currency_, Str :$date=$date_) {
 
