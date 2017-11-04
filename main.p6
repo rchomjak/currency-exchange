@@ -1,5 +1,5 @@
 #!/usr/bin/env perl6
-use v6;
+use v6.c;
 
 BEGIN {try {
 require XML;
@@ -21,6 +21,34 @@ require JSON::Tiny;
 
          List of banks which sell/buys currency:
          NBP (National Bank of Poland) - NBP also sells/buys currency , PEKAO, MBANK
+
+         Usage:
+             {$*PROGRAM-NAME} --currency=<Str> [--buy-sell=<Str>] [--http-timeout=<Int>] [--date=<Str>]
+
+         Where 'currency'
+             is ISO 4217 symbol, not every currency bank sells/buys.
+         Where 'buy-sell'
+             what you want to see from banks, choice buy, sell, all.
+         Where 'http-timeout'
+             defines HTTP/s timeout for requests. (GLOBAL) default 10.
+         Where 'date'
+             defines date in format YYYY-MM-DD from which date you want record.
+             NOTE: Bank PEKAO works only for 'date' = today
+
+         Examples:
+             Returns everything (sell/buy) in currency CZK in date today.
+             {$*PROGRAM-NAME} --currency=CZK
+
+             Returns buy in currency CZK in date 2017-10-25.
+             {$*PROGRAM-NAME} --buy-sell='buy' --currency=CZK --date="2017-10-25"
+
+         NOTE:
+             Important:
+                 If you have specified date as day when markets were close.
+                 You will may get same error response as problem with internet connection.
+
+         DEPENDENCIES:
+             XML, IO::String, HTTP::Tinyish, CSV::Parser, JSON::Tiny
 
          EOH
 
@@ -44,8 +72,6 @@ use MBANK;
 use PEKAO;
 
 
-
-
 my %*SUB-MAIN-OPTS =
   :named-anywhere,    # allow named variables at any location
 ;
@@ -60,13 +86,30 @@ multi sub MAIN(Str :$buy-sell="all", Int :$http-timeout=10, Str :$date=Date.toda
       USAGE();
       exit;
     }
-    if $date !~~ /((\d\d\d\d)\-(\d\d)\-(\d\d))/  {
-      USAGE();
-      exit;
-    }
+
     $currency = $currency.uc;
 
+    try {
+      Date.new($date);
+      CATCH {
+        default {
+          say "Invalid Date string " ~ $date ~ " use YYYY-MM-DD format";
+          exit
+        }
+      }
+    }
 
+    if Date.new($date) > Date.today {
+        say "You are trying reach a future, your date is invalid." ;
+        exit;
+
+    }
+
+    if Date.new($date).day-of-week == 7 || Date.new($date).day-of-week == 6 {
+        say "Date " ~ $date ~ " is weekend, markets are close.";
+        exit;
+
+    }
 
     if Date.new($date).gist.Str eq Date.today.gist.Str {
         @objs_parallel = (NBPref::NBPref.new(currency=>$currency, http_timeout=>$http-timeout, date=>$date),
@@ -74,7 +117,6 @@ multi sub MAIN(Str :$buy-sell="all", Int :$http-timeout=10, Str :$date=Date.toda
                             MBANK::MBANK.new(currency=>$currency, http_timeout=>$http-timeout, date=>$date),
                             PEKAO::PEKAO.new(currency=>$currency, http_timeout=>$http-timeout, date=>$date));
     } else {
-        say $date;
         @objs_parallel = (NBPref::NBPref.new(currency=>$currency, http_timeout=>$http-timeout, date=>$date),
                             NBP::NBP.new(currency=>$currency, http_timeout=>$http-timeout, date=>$date),
                             MBANK::MBANK.new(currency=>$currency, http_timeout=>$http-timeout, date=>$date));
