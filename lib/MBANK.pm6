@@ -5,7 +5,7 @@ unit module MBANK;
 
 class  MBANK::MBANK does Bank::currency-value  {
 
-    use IO::String;
+    #use IO::String;
     use CSV::Parser;
     use HTTP::Tinyish;
 
