@@ -3,7 +3,7 @@ use v6.c;
 
 BEGIN {try {
 require XML;
-#require IO::String;
+require IO::String;
 require HTTP::Tinyish;
 require CSV::Parser;
 require JSON::Tiny;
@@ -48,7 +48,7 @@ require JSON::Tiny;
                  You will may get same error response as problem with internet connection.
 
          DEPENDENCIES:
-             XML, HTTP::Tinyish, CSV::Parser, JSON::Tiny
+             XML, HTTP::Tinyish, CSV::Parser, JSON::Tiny, IO::String
 
          EOH
 
@@ -60,7 +60,7 @@ require JSON::Tiny;
 use lib 'lib';
 
 use XML;
-#use IO::String;
+use IO::String;
 use HTTP::Tinyish;
 use CSV::Parser;
 use JSON::Tiny;
@@ -247,7 +247,7 @@ NOTE:
         You will may get same error response as problem with internet connection.
 
 DEPENDENCIES:
-    XML, HTTP::Tinyish, CSV::Parser, JSON::Tiny
+    XML, HTTP::Tinyish, CSV::Parser, JSON::Tiny, IO::String
 
 EOH
 }
