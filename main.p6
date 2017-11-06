@@ -57,8 +57,10 @@ require JSON::Tiny;
     }
 }}
 
-use lib 'lib';
 
+
+
+use lib $*PROGRAM.sibling: '/lib';;
 use XML;
 use IO::String;
 use HTTP::Tinyish;
