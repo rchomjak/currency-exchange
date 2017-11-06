@@ -49,15 +49,16 @@ class  NBP::NBP does Bank::currency-value {
         }
 
 
-    my %res_content = from-json %.res<content>;
+    if %.res<content>.elems != 0 {
+        my %res_content = from-json %.res<content>;
 
-    %.valutes{"code"} = %res_content<code>;
-    %.valutes{"full_name"} = %res_content<currency>;
-    %.valutes{"date"} = %(%res_content<rates>[0])<effectiveDate>;
+        %.valutes{"code"} = %res_content<code>;
+        %.valutes{"full_name"} = %res_content<currency>;
+        %.valutes{"date"} = %(%res_content<rates>[0])<effectiveDate>;
 
-    %.valutes{"ask"} = %(%res_content<rates>[0])<ask>;
-    %.valutes{"bid"} = %(%res_content<rates>[0])<bid>;
-
+        %.valutes{"ask"} = %(%res_content<rates>[0])<ask>;
+        %.valutes{"bid"} = %(%res_content<rates>[0])<bid>;
+    }
     self;
 
     }

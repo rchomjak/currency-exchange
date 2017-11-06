@@ -30,7 +30,7 @@ require JSON::Tiny;
          Where 'buy-sell'
              what you want to see from banks, choice buy, sell, all.
          Where 'http-timeout'
-             defines HTTP/s timeout for requests. (GLOBAL) default 10.
+             defines HTTP/s timeout for requests. (GLOBAL) default 15.
          Where 'date'
              defines date in format YYYY-MM-DD from which date you want record.
              NOTE: Bank PEKAO works only for 'date' = today
@@ -76,7 +76,7 @@ my %*SUB-MAIN-OPTS =
   :named-anywhere,    # allow named variables at any location
 ;
 
-multi sub MAIN(Str :$buy-sell="all", Int :$http-timeout=10, Str :$date=Date.today.gist.Str, Str :$currency! is rw) {
+multi sub MAIN(Str :$buy-sell="all", Int :$http-timeout=15, Str :$date=Date.today.gist.Str, Str :$currency! is rw) {
 
     my @objs_parallel;
     my @parallel_data;
@@ -229,7 +229,7 @@ Where 'currency'
 Where 'buy-sell'
     what you want to see from banks, choice buy, sell, all.
 Where 'http-timeout'
-    defines HTTP/s timeout for requests. (GLOBAL) default 10.
+    defines HTTP/s timeout for requests. (GLOBAL) default 15.
 Where 'date'
     defines date in format YYYY-MM-DD from which date you want record.
     NOTE: Bank PEKAO works only for 'date' = today
