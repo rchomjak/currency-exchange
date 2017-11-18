@@ -68,15 +68,21 @@ class  MBANK::MBANK does Bank::currency-value  {
                                          field_separator=>';');
         my %csv_data;
 
+        $.dwn_state = False;
 
         while %csv_data = %($csv_parser.get_line()) {
+
 
             if %csv_data<Currency> eq $.currency {
                 %.valutes{"code"} = $.currency;
                 %.valutes{"full_name"} = %csv_data{"Name"};
                 %.valutes{"ask"} = %csv_data{"Sell"}.Rat/%csv_data{"Reference number"}.Rat;
                 %.valutes{"bid"} = %csv_data{"Buy"}.Rat/%csv_data{"Reference number"}.Rat;
+                $.dwn_state = True;
+
                 last;
+            } else {
+
             }
 
         }

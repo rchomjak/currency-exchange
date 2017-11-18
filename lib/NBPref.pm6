@@ -59,4 +59,54 @@ class  NBPref::NBPref does Bank::currency-value  {
         self;
     }
 
+class  NBPref::NBPrefCurrList does Bank::currency-value {
+
+        use JSON::Tiny;
+        use HTTP::Tinyish;
+
+        has %.valutes is rw;
+        has %.res;
+        has Str $.table;
+        has Str $.url is rw = qqww{http://api.nbp.pl/api/exchangerates/tables/} ;
+        has Bool $.dwn_state is rw = False;
+        has Int $.http_timeout;
+        has $.currency_code_name is rw;
+
+        method new(Int $http_timeout_=5, Str $table_="a",  Str :$table=$table_,  Int :$http_timeout=$http_timeout_) {
+            self.bless(:$table, :$http_timeout);
+        }
+        method TWEAK() {
+
+            $.url = $.url ~ "$.table?format=json";
+        }
+
+        method set_url (Str $new_url) {
+            $.url = $new_url;
+        }
+
+        method download_data{
+
+            my $http = HTTP::Tinyish.new(agent => 'Mozilla/5.0', timeout=>$.http_timeout);
+            %.res = $http.get($.url);
+
+            if %.res<status>.Int == 200 {
+                $.dwn_state = True;
+            }
+
+            self
+        }
+
+        method make_data {
+
+            if  $.dwn_state == False {
+                return self
+            }
+
+            my @res_content = from-json %.res<content>;
+            $.currency_code_name = @res_content[0][0]<rates>;
+            #@.currency_code_name = %res_content('rates');
+            self;
+        }
+
+    }
 }

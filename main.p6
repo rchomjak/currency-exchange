@@ -17,13 +17,14 @@ require JSON::Tiny;
          Downloads and sorts currency rates for specified operation based on currency.
          Program shows mid. currency rate (Zloty) based on National Bank of Poland as reference.
 
-         Every bank output record is in ZL => Zloty currency.
+         Every bank output record is in ZL (PLN) => Zloty currency.
 
          List of banks which sell/buys currency:
          NBP (National Bank of Poland) - NBP also sells/buys currency , PEKAO, MBANK
 
          Usage:
              {$*PROGRAM-NAME} --currency=<Str> [--buy-sell=<Str>] [--http-timeout=<Int>] [--date=<Str>]
+             {$*PROGRAM-NAME} --currency-list
 
          Where 'currency'
              is ISO 4217 symbol, not every currency bank sells/buys.
@@ -42,10 +43,15 @@ require JSON::Tiny;
              Returns buy in currency CZK in date 2017-10-25.
              {$*PROGRAM-NAME} --buy-sell='buy' --currency=CZK --date="2017-10-25"
 
+             Returns currency list
+             {$*PROGRAM-NAME} --currency-list
+
          NOTE:
              Important:
-                 If you have specified date as day when markets were close.
+                 If you have specified date as weekend or day when markets were close.
                  You will may get same error response as problem with internet connection.
+
+             Some banks do not handle currency which can be listed with parameter --currency-list
 
          DEPENDENCIES:
              XML, HTTP::Tinyish, CSV::Parser, JSON::Tiny, IO::String
@@ -60,7 +66,7 @@ require JSON::Tiny;
 
 
 
-use lib $*PROGRAM.sibling: '/lib';;
+use lib $*PROGRAM.sibling: 'lib';;
 use XML;
 use IO::String;
 use HTTP::Tinyish;
@@ -181,7 +187,7 @@ multi sub MAIN(Str :$buy-sell="all", Int :$http-timeout=15, Str :$date=Date.toda
 
     my $buy_func = {
 
-        my @sell_objs =  @objs_parallel.grep({$_.valutes.defined && $_.valutes.elems && $_.WHAT.gist.Str !~~ /"NBPref"/}).sort({$_.valutes{'ask'}});
+        my @sell_objs =  @objs_parallel.grep({$_.dwn_state && $_.valutes.defined && $_.valutes.elems && $_.WHAT.gist.Str !~~ /"NBPref"/}).sort({$_.valutes{'ask'}});
         say "-.-."x(20);
         say "Sorted price of banks for buy";
         say "-.-."x(20);
@@ -208,7 +214,26 @@ multi sub MAIN(Str :$buy-sell="all", Int :$http-timeout=15, Str :$date=Date.toda
 }
 
 
+multi sub MAIN(Bool :$currency-list!) {
+    my $a = NBPref::NBPrefCurrList.new();
+    $a.download_data.make_data;
 
+    if $a.dwn_state = False {
+        print "Cannot dowload currency-list from NBP.";
+        exit;
+    }
+
+
+    say "ISO Code, " ~ " " ~  "Name of currency";
+    say "-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.";
+
+
+    #dd $a.currency_code_name;
+    for $a.currency_code_name[0..*] -> %currency_data {
+        #say %currency_data<code>, $currency_data<currency>;
+        say %currency_data<code> ~ ", " ~ %currency_data<currency>;
+    }
+}
 
 
 
@@ -218,13 +243,14 @@ print Q:c:to/EOH/;
 Downloads and sorts currency rates for specified operation based on currency.
 Program shows mid. currency rate (Zloty) based on National Bank of Poland as reference.
 
-Every bank output record is in ZL => Zloty currency.
+Every bank output record is in ZL (PLN) => Zloty currency.
 
 List of banks which sell/buys currency:
 NBP (National Bank of Poland) - NBP also sells/buys currency , PEKAO, MBANK
 
 Usage:
     {$*PROGRAM-NAME} --currency=<Str> [--buy-sell=<Str>] [--http-timeout=<Int>] [--date=<Str>]
+    {$*PROGRAM-NAME} --currency-list
 
 Where 'currency'
     is ISO 4217 symbol, not every currency bank sells/buys.
@@ -243,10 +269,15 @@ Examples:
     Returns buy in currency CZK in date 2017-10-25.
     {$*PROGRAM-NAME} --buy-sell='buy' --currency=CZK --date="2017-10-25"
 
+    Returns currency list
+    {$*PROGRAM-NAME} --currency-list
+
 NOTE:
     Important:
         If you have specified date as weekend or day when markets were close.
         You will may get same error response as problem with internet connection.
+
+    Some banks do not handle currency which can be listed with parameter --currency-list
 
 DEPENDENCIES:
     XML, HTTP::Tinyish, CSV::Parser, JSON::Tiny, IO::String
