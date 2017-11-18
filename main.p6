@@ -218,8 +218,9 @@ multi sub MAIN(Bool :$currency-list!) {
     my $a = NBPref::NBPrefCurrList.new();
     $a.download_data.make_data;
 
-    if $a.dwn_state = False {
-        print "Cannot dowload currency-list from NBP.";
+
+    if ($a.dwn_state == False) {
+        say "Cannot dowload currency-list from NBP.";
         exit;
     }
 
