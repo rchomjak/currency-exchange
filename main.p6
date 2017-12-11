@@ -138,23 +138,7 @@ multi sub MAIN(Str :$buy-sell="all", Int :$http-timeout=15, Str :$date=Date.toda
     my @cannot_download = @objs_parallel.grep({$_.dwn_state == False});
     my @incorrect_download = @objs_parallel.grep({$_.down_correct_data == False});
 
-    if @cannot_download.elems {
-        say "Cannot download data for following banks:";
 
-        for @cannot_download -> $elem {
-            say $elem.WHAT.gist.Str ~" url: " ~ $elem.url;
-        }
-
-    }
-
-    if @incorrect_download.elems {
-        say "The following banks PROBABLY does not trade the currency:";
-
-        for @incorrect_download -> $elem {
-            say $elem.WHAT.gist.Str;
-        }
-
-    }
 
 
 
@@ -162,6 +146,15 @@ multi sub MAIN(Str :$buy-sell="all", Int :$http-timeout=15, Str :$date=Date.toda
 
 
     my $nbp_text = sub (@ref) {
+
+        my $ref = @ref[0];
+
+        if ! $ref.down_correct_data && $ref.dwn_state {
+            say "The currency, the reference Central Bank (National Bank of Poland) does not handle.";
+            say "exiting...";
+            exit;
+        }
+
         if  ! @ref.elems {
             say "For date $date, the reference Central Bank (National Bank of Poland) does not have record.";
             say "exiting...";
@@ -221,6 +214,25 @@ multi sub MAIN(Str :$buy-sell="all", Int :$http-timeout=15, Str :$date=Date.toda
     if $buy-sell eq 'all' || $buy-sell eq 'buy' {
         $buy_func();
     }
+
+    if @cannot_download.elems {
+        say "Cannot download data for following banks:";
+
+        for @cannot_download -> $elem {
+            say $elem.WHAT.gist.Str ~" url: " ~ $elem.url;
+        }
+
+    }
+
+    if @incorrect_download.elems {
+        say "The following banks does not trade the currency:";
+
+        for @incorrect_download -> $elem {
+            say $elem.WHAT.gist.Str;
+        }
+
+    }
+
 
 
 }

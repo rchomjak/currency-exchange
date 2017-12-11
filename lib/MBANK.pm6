@@ -75,7 +75,7 @@ class  MBANK::MBANK does Bank::currency-value  {
                                          field_separator=>';');
         my %csv_data;
 
-        $.dwn_state = False;
+        $.down_correct_data = False;
 
         while %csv_data = %($csv_parser.get_line()) {
 
