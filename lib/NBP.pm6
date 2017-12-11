@@ -16,6 +16,8 @@ class  NBP::NBP does Bank::currency-value {
     has Str $.url is rw = qqww{http://api.nbp.pl/api/exchangerates/rates/} ;
     has Str $.date;
     has Bool $.dwn_state is rw = False;
+    has Bool $.down_correct_data is rw = False;
+
     has Int $.http_timeout;
 
     method new(Str $currency_?, Str $table_="c", Int $http_timeout_=5, Str $date_=Date.today.gist.Str, Int :$http_timeout=$http_timeout_, Str :$currency = $currency_, Str :$table=$table_, Str :$date=$date_) {
@@ -35,16 +37,25 @@ class  NBP::NBP does Bank::currency-value {
         my $http = HTTP::Tinyish.new(agent => 'Mozilla/5.0', timeout=>$.http_timeout);
         %.res = $http.get($.url);
 
-        if %.res<status>.Int == 200 {
-            $.dwn_state = True;
+
+        if %.res<headers><content-length> > 0 {
+          $.dwn_state = True;
         }
+
+
+        if %.res<status>.Int == 200 {
+            $.down_correct_data = True;
+        }
+
+
+
 
         self
     }
 
     method make_data {
 
-        if  $.dwn_state == False {
+        if  $.dwn_state == False or $.down_correct_data == False {
             return self
         }
 

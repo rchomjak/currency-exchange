@@ -16,6 +16,7 @@ class  NBPref::NBPref does Bank::currency-value  {
     has Str $.url is rw = qqww{http://api.nbp.pl/api/exchangerates/rates/} ;
     has Str $.date;
     has Bool $.dwn_state is rw = False;
+    has Bool $.down_correct_data is rw = False;
     has Int $.http_timeout;
 
     method new(Str $currency_?, Int $http_timeout_=5, Str $table_="a", Str $date_=Date.today.gist.Str, Str :$currency=$currency_, Str :$table=$table_, Str :$date=$date_, Int :$http_timeout=$http_timeout_) {
@@ -36,8 +37,13 @@ class  NBPref::NBPref does Bank::currency-value  {
         my $http = HTTP::Tinyish.new(agent => 'Mozilla/5.0', timeout=>$.http_timeout);
         %.res = $http.get($.url);
 
+        if %.res<success> {
+          $.dwn_state = True;
+        }
+
+
         if %.res<status>.Int == 200 {
-            $.dwn_state = True;
+            $.down_correct_data = True;
         }
 
         self
@@ -45,7 +51,7 @@ class  NBPref::NBPref does Bank::currency-value  {
 
     method make_data {
 
-        if  $.dwn_state == False {
+        if  $.dwn_state == False or $.down_correct_data == False {
             return self
         }
 
@@ -69,6 +75,7 @@ class  NBPref::NBPrefCurrList does Bank::currency-value {
         has Str $.table;
         has Str $.url is rw = qqww{http://api.nbp.pl/api/exchangerates/tables/} ;
         has Bool $.dwn_state is rw = False;
+        has Bool $.down_correct_data is rw = False;
         has Int $.http_timeout;
         has $.currency_code_name is rw;
 
@@ -89,16 +96,20 @@ class  NBPref::NBPrefCurrList does Bank::currency-value {
             my $http = HTTP::Tinyish.new(agent => 'Mozilla/5.0', timeout=>$.http_timeout);
             %.res = $http.get($.url);
 
-            if %.res<status>.Int == 200 {
-                $.dwn_state = True;
+            if %.res<success> {
+              $.dwn_state = True;
             }
 
+
+            if %.res<status>.Int == 200 {
+                $.down_correct_data = True;
+            }
             self
         }
 
         method make_data {
 
-            if  $.dwn_state == False {
+            if  $.dwn_state == False or $.down_correct_data == False {
                 return self
             }
 

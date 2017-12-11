@@ -1,5 +1,6 @@
 use v6;
 
+
 use Bank;
 unit module PEKAO;
 
@@ -18,6 +19,7 @@ class  PEKAO::PEKAO does Bank::currency-value {
     has Str $.url is rw = qqww{https://www.pekao.com.pl/exchange_static?type=pekao&format=XML};
     has Str $.date;
     has Bool $.dwn_state is rw = False;
+    has Bool $.down_correct_data is rw = False;
 
     method new(Str $currency_?, Int $http_timeout_=10, Str $date_=Date.today.gist.Str, Int :$http_timeout=$http_timeout_, Str :$currency = $currency_, Str :$date=$date_) {
 
@@ -37,16 +39,22 @@ class  PEKAO::PEKAO does Bank::currency-value {
         my $http = HTTP::Tinyish.new(agent => 'Mozilla/5.0', timeout=>$.http_timeout);
         %.res = $http.get($.url);
 
-        if %.res<status>.Int == 200 {
-            $.dwn_state = True;
+        if  %.res<headers><content-length> > 0 {
+          $.dwn_state = True;
         }
+
+
+        if %.res<status>.Int == 200 {
+            $.down_correct_data = True;
+        }
+
 
         self
     }
 
     method make_data {
 
-        if  $.dwn_state == False {
+        if  $.dwn_state == False or $.down_correct_data == False {
             return self
         }
 

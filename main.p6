@@ -136,6 +136,7 @@ multi sub MAIN(Str :$buy-sell="all", Int :$http-timeout=15, Str :$date=Date.toda
     await @parallel_data;
 
     my @cannot_download = @objs_parallel.grep({$_.dwn_state == False});
+    my @incorrect_download = @objs_parallel.grep({$_.down_correct_data == False});
 
     if @cannot_download.elems {
         say "Cannot download data for following banks:";
@@ -145,6 +146,17 @@ multi sub MAIN(Str :$buy-sell="all", Int :$http-timeout=15, Str :$date=Date.toda
         }
 
     }
+
+    if @incorrect_download.elems {
+        say "The following banks PROBABLY does not trade the currency:";
+
+        for @incorrect_download -> $elem {
+            say $elem.WHAT.gist.Str;
+        }
+
+    }
+
+
 
     my @ref_objs = @objs_parallel.grep({ $_.dwn_state && $_.valutes.defined && $_.valutes.elems && $_.WHAT.gist.Str ~~ /"NBPref"/});
 
@@ -221,6 +233,11 @@ multi sub MAIN(Bool :$currency-list!) {
 
     if ($a.dwn_state == False) {
         say "Cannot dowload currency-list from NBP.";
+        exit;
+    }
+
+    if ($a.down_correct_data == False) {
+        say "The bank does not handle the currency.";
         exit;
     }
 
