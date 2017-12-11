@@ -20,7 +20,10 @@ class  NBPref::NBPref does Bank::currency-value  {
     has Int $.http_timeout;
 
     method new(Str $currency_?, Int $http_timeout_=5, Str $table_="a", Str $date_=Date.today.gist.Str, Str :$currency=$currency_, Str :$table=$table_, Str :$date=$date_, Int :$http_timeout=$http_timeout_) {
-        self.bless(:$currency, :$table, :$date, :$http_timeout);
+
+        my $dwn_state = False;
+        my $down_correct_data = False;
+        self.bless(:$currency, :$table, :$date, :$http_timeout, :$dwn_state, :$down_correct_data);
     }
     method TWEAK() {
 

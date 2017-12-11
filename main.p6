@@ -149,7 +149,7 @@ multi sub MAIN(Str :$buy-sell="all", Int :$http-timeout=15, Str :$date=Date.toda
 
         my $ref = @ref[0];
 
-        if ! $ref.down_correct_data && $ref.dwn_state {
+        if $ref.defined && ! $ref.down_correct_data && $ref.dwn_state {
             say "The currency, the reference Central Bank (National Bank of Poland) does not handle.";
             say "exiting...";
             exit;
@@ -160,7 +160,6 @@ multi sub MAIN(Str :$buy-sell="all", Int :$http-timeout=15, Str :$date=Date.toda
             say "exiting...";
             exit;
         } else {
-            my $ref = @ref[0];
             say "-.-."x(20);
             say "Reference bank,the National Bank of Poland, for $date, in currency $currency";
             say "-.-."x(20);
@@ -175,7 +174,7 @@ multi sub MAIN(Str :$buy-sell="all", Int :$http-timeout=15, Str :$date=Date.toda
 
     my $sell_func = {
 
-        my @sell_objs =  @objs_parallel.grep({ $_.dwn_state && $_.valutes.defined && $_.valutes.elems && $_.WHAT.gist.Str !~~ /"NBPref"/}).sort({-1*$_.valutes{'bid'}});
+        my @sell_objs =  @objs_parallel.grep({ $_.down_correct_data && $_.dwn_state && $_.valutes.defined && $_.valutes.elems && $_.WHAT.gist.Str !~~ /"NBPref"/}).sort({-1*$_.valutes{'bid'}});
         say "-.-."x(20);
         say "Sorted price of banks for sell";
         say "-.-."x(20);
@@ -192,7 +191,7 @@ multi sub MAIN(Str :$buy-sell="all", Int :$http-timeout=15, Str :$date=Date.toda
 
     my $buy_func = {
 
-        my @sell_objs =  @objs_parallel.grep({$_.dwn_state && $_.valutes.defined && $_.valutes.elems && $_.WHAT.gist.Str !~~ /"NBPref"/}).sort({$_.valutes{'ask'}});
+        my @sell_objs =  @objs_parallel.grep({$_.down_correct_data && $_.dwn_state && $_.valutes.defined && $_.valutes.elems && $_.WHAT.gist.Str !~~ /"NBPref"/}).sort({$_.valutes{'ask'}});
         say "-.-."x(20);
         say "Sorted price of banks for buy";
         say "-.-."x(20);
